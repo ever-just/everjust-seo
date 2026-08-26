@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { getRequiredEnvValue } from "@/server/lib/runtime-env";
 import { captureServerError } from "@/server/lib/posthog";
+import { isBillingEnabled } from "./autumn";
 import { syncAutumnCustomerStatus } from "./customer-status-sync";
 import { verifySvixSignature } from "./svix";
 
@@ -21,6 +22,13 @@ export async function handleAutumnWebhookRequest(request: Request) {
       headers: { Allow: "POST" },
       status: 405,
     });
+  }
+
+  // Billing disabled: no Autumn account, so no genuine webhook can arrive and
+  // AUTUMN_WEBHOOK_SECRET is unset. Return a benign 404 instead of throwing on
+  // the missing secret (which would surface as a 500).
+  if (!isBillingEnabled()) {
+    return json({ error: "Billing is not configured" }, 404);
   }
 
   const rawPayload = await request.text();

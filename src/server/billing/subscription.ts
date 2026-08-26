@@ -10,9 +10,19 @@ import {
   roundUsdForBilling,
 } from "@/shared/billing";
 import type { CreditFeature } from "@/shared/billing-credit-features";
-import { autumn, AUTUMN_TRACK_RETRY_OPTIONS } from "@/server/billing/autumn";
+import {
+  autumn,
+  AUTUMN_TRACK_RETRY_OPTIONS,
+  isBillingEnabled,
+} from "@/server/billing/autumn";
 import { captureServerEvent } from "@/server/lib/posthog";
 import { AppError } from "@/server/lib/errors";
+
+// When billing is disabled (no Autumn secret configured) every credit gate
+// reports full access. This sentinel stands in for the balance an Autumn read
+// would return; it is only ever passed into no-op paths (trackUsageCreditSpend
+// short-circuits while disabled), so its exact magnitude is inert.
+const UNLIMITED_CREDITS_REMAINING = Number.MAX_SAFE_INTEGER;
 
 export type BillingCustomerContext = Pick<
   EnsuredUserContext,
@@ -34,6 +44,13 @@ const customerEnsuredKey = (organizationId: string) =>
 export async function getOrCreateOrganizationCustomer(
   context: BillingCustomerContext,
 ): Promise<{ id: string }> {
+  // No Autumn account: skip the round trip entirely. The org id is the customer
+  // id everywhere billing is enabled, so returning it keeps every caller's
+  // `.id` usage working with no behavior change once billing is configured.
+  if (!isBillingEnabled()) {
+    return { id: context.organizationId };
+  }
+
   const cacheKey = customerEnsuredKey(context.organizationId);
   try {
     if (await env.KV.get(cacheKey)) {
@@ -67,6 +84,9 @@ export async function customerHasPaidPlan(
   customerId: string,
   opts: { retryDenied?: boolean } = {},
 ) {
+  // Billing disabled: every org has full access (paid-tier behavior).
+  if (!isBillingEnabled()) return true;
+
   const result = await autumn.check({
     customerId,
     featureId: AUTUMN_PAID_PLAN_FEATURE_ID,
@@ -87,6 +107,9 @@ export async function customerHasPaidPlan(
 }
 
 export async function customerHasManagedAccess(customerId: string) {
+  // Billing disabled: no product gating, so managed access is always granted.
+  if (!isBillingEnabled()) return true;
+
   const result = await autumn.check({
     customerId,
     featureId: AUTUMN_MANAGED_ACCESS_FEATURE_ID,
@@ -102,6 +125,17 @@ async function getUsageCreditsRemaining(customerId: string): Promise<{
   monthlyRemaining: number;
   topupRemaining: number;
 }> {
+  // Billing disabled: report effectively-unlimited credits. This is the single
+  // reader behind assertUsageCreditsAvailable (never throws INSUFFICIENT_CREDITS)
+  // and checkUsageCreditsDepleted (never reports depleted, so its confirm-path
+  // Autumn read is unreachable).
+  if (!isBillingEnabled()) {
+    return {
+      monthlyRemaining: UNLIMITED_CREDITS_REMAINING,
+      topupRemaining: UNLIMITED_CREDITS_REMAINING,
+    };
+  }
+
   const [monthlyCheck, topupCheck] = await Promise.all([
     autumn.check({ customerId, featureId: AUTUMN_SEO_DATA_BALANCE_FEATURE_ID }),
     autumn.check({
@@ -234,6 +268,9 @@ export async function trackUsageCreditSpend(args: {
   monthlyRemaining: number;
   properties?: Record<string, unknown>;
 }): Promise<void> {
+  // Billing disabled: nothing to meter or deduct.
+  if (!isBillingEnabled()) return;
+
   const totalCostUsd = roundUsdForBilling(args.costUsd * SEO_DATA_COST_MARKUP);
   const totalCostCredits = Math.ceil(
     totalCostUsd * AUTUMN_SEO_DATA_CREDITS_PER_USD,

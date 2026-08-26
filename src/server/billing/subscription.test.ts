@@ -5,11 +5,20 @@ import {
   AUTUMN_SEO_DATA_TOPUP_BALANCE_FEATURE_ID,
 } from "@/shared/billing";
 
-const { checkMock, getOrCreateMock, kvGetMock, kvPutMock } = vi.hoisted(() => ({
+const {
+  checkMock,
+  getOrCreateMock,
+  kvGetMock,
+  kvPutMock,
+  trackMock,
+  isBillingEnabledMock,
+} = vi.hoisted(() => ({
   checkMock: vi.fn(),
   getOrCreateMock: vi.fn(),
   kvGetMock: vi.fn(),
   kvPutMock: vi.fn(),
+  trackMock: vi.fn(),
+  isBillingEnabledMock: vi.fn(),
 }));
 
 vi.mock("cloudflare:workers", () => ({
@@ -17,8 +26,11 @@ vi.mock("cloudflare:workers", () => ({
 }));
 
 vi.mock("@/server/billing/autumn", () => ({
+  isBillingEnabled: isBillingEnabledMock,
+  AUTUMN_TRACK_RETRY_OPTIONS: {},
   autumn: {
     check: checkMock,
+    track: trackMock,
     customers: {
       getOrCreate: getOrCreateMock,
     },
@@ -37,8 +49,11 @@ vi.mock("@/server/lib/posthog", () => ({
 
 import {
   assertUsageCreditsAvailable,
+  checkUsageCreditsDepleted,
+  customerHasManagedAccess,
   customerHasPaidPlan,
   getOrCreateOrganizationCustomer,
+  trackUsageCreditSpend,
 } from "./subscription";
 
 describe("subscription billing", () => {
@@ -46,6 +61,8 @@ describe("subscription billing", () => {
     vi.clearAllMocks();
     kvGetMock.mockResolvedValue(null);
     kvPutMock.mockResolvedValue(undefined);
+    // Existing tests assert the Autumn-enabled behavior.
+    isBillingEnabledMock.mockReturnValue(true);
   });
 
   afterEach(() => {
@@ -193,5 +210,61 @@ describe("subscription billing", () => {
       "billing.customer-cache-write failed:",
       cacheError,
     );
+  });
+});
+
+describe("subscription billing (billing disabled)", () => {
+  const customer = {
+    organizationId: "org_123",
+    userId: "user_123",
+    userEmail: "alice@example.com",
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    isBillingEnabledMock.mockReturnValue(false);
+  });
+
+  it("resolves the customer to the org id without calling Autumn", async () => {
+    await expect(getOrCreateOrganizationCustomer(customer)).resolves.toEqual({
+      id: "org_123",
+    });
+    expect(getOrCreateMock).not.toHaveBeenCalled();
+    expect(kvGetMock).not.toHaveBeenCalled();
+  });
+
+  it("never throws INSUFFICIENT_CREDITS and reports unlimited", async () => {
+    await expect(assertUsageCreditsAvailable("org_123")).resolves.toEqual({
+      monthlyRemaining: Number.MAX_SAFE_INTEGER,
+    });
+    expect(checkMock).not.toHaveBeenCalled();
+  });
+
+  it("reports credits as not depleted", async () => {
+    await expect(checkUsageCreditsDepleted(customer)).resolves.toEqual({
+      depleted: false,
+      monthlyRemaining: Number.MAX_SAFE_INTEGER,
+    });
+    expect(checkMock).not.toHaveBeenCalled();
+    expect(getOrCreateMock).not.toHaveBeenCalled();
+  });
+
+  it("grants paid and managed access without checking Autumn", async () => {
+    await expect(customerHasPaidPlan("org_123")).resolves.toBe(true);
+    await expect(customerHasManagedAccess("org_123")).resolves.toBe(true);
+    expect(checkMock).not.toHaveBeenCalled();
+  });
+
+  it("no-ops spend tracking", async () => {
+    await expect(
+      trackUsageCreditSpend({
+        customer,
+        customerId: "org_123",
+        creditFeature: "keyword_research",
+        costUsd: 5,
+        monthlyRemaining: 0,
+      }),
+    ).resolves.toBeUndefined();
+    expect(trackMock).not.toHaveBeenCalled();
   });
 });

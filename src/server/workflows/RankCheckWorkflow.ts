@@ -17,7 +17,7 @@ import { pgStep } from "@/server/workflows/pgStep";
 import { createDataforseoClient } from "@/server/lib/dataforseo";
 import { captureServerEvent } from "@/server/lib/posthog";
 import { AppError } from "@/server/lib/errors";
-import { autumn } from "@/server/billing/autumn";
+import { autumn, isBillingEnabled } from "@/server/billing/autumn";
 import {
   AUTUMN_SEO_DATA_BALANCE_FEATURE_ID,
   AUTUMN_SEO_DATA_TOPUP_BALANCE_FEATURE_ID,
@@ -101,7 +101,9 @@ export async function prepareRankCheckKeywords(input: {
   // Verify the user has enough credits for the full check before starting.
   // Scheduled checks go through the cheaper task queue, so estimate at queued
   // pricing — a live-price estimate would skip checks the user can afford.
-  if (await isHostedServerAuthMode()) {
+  // Skipped entirely when billing is disabled (no Autumn account): there is no
+  // credit pool to gate against, and autumn.check would throw on the missing key.
+  if (isBillingEnabled() && (await isHostedServerAuthMode())) {
     const [monthlyCheck, topupCheck] = await Promise.all([
       autumn.check({
         customerId: input.billingCustomer.organizationId,

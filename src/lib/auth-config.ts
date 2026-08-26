@@ -27,30 +27,33 @@ export function createBaseAuthConfig() {
       },
     },
     plugins: [
-      // Block user-initiated org creation: each org is its own Autumn customer
-      // with its own onboarding-plan credit grant, so an authenticated user
-      // hitting POST /api/auth/organization/create could mint unlimited fresh
-      // grants. The app gives every user exactly one workspace, created
-      // server-side at signup via `auth.api.createOrganization({ body: { userId }})`
-      // — that's a "system action" (no session + userId in body) which better-auth
-      // exempts from this flag, so the bootstrap keeps working.
+      // Organizations are the tenant boundary for this self-host multi-tenant
+      // build: each org is a workspace, and users own the full lifecycle —
+      // create workspaces, invite teammates, and delete workspaces they own.
       //
-      // invitationLimit: 0 closes the other path to multi-org membership.
-      // "One user, one workspace" is a billing invariant: MCP API keys bill the
-      // user's first org, sessions bill the active org — identical only while
-      // users can't be invited into a second workspace. Remove this when teams
-      // ship, in the same change that moves API-key requests to project-level
-      // authz (org derived per tool call from the project; keys stay
-      // user-scoped, no key→workspace binding).
+      // Upstream locked all three down (allowUserToCreateOrganization: false,
+      // invitationLimit: 0, disableOrganizationDeletion: true) because on the
+      // hosted SaaS each org is its own Autumn billing customer with its own
+      // credit grant, so user-initiated create/delete could mint unlimited
+      // fresh grants and multi-org membership broke the "one user, one
+      // workspace" billing invariant. Here billing is a no-op unless Autumn is
+      // configured (see isBillingEnabled / src/server/billing), so none of that
+      // applies and the tenant model is genuinely multi-org.
       //
-      // disableOrganizationDeletion closes the delete side of the same loop:
-      // POST /api/auth/organization/delete (owner-callable by default) would
-      // cascade-delete the workspace, and the next request auto-creates a fresh
-      // org id — a fresh Autumn customer with a fresh credit grant.
+      // Every user still gets a default workspace created server-side at signup
+      // via `auth.api.createOrganization({ body: { userId } })` — a better-auth
+      // "system action" (no session + userId in body) exempt from
+      // allowUserToCreateOrganization — so the bootstrap keeps working.
+      //
+      // NOTE (follow-up, tracked in docs/SELFHOST_MULTITENANT.md): MCP API keys
+      // still scope/bill to the user's first org rather than being derived
+      // per-request from the project. Harden that (project-level authz, keys
+      // stay user-scoped with no key→workspace binding) before exposing this to
+      // untrusted multi-tenant use with billing enabled.
       organization({
-        allowUserToCreateOrganization: false,
-        invitationLimit: 0,
-        disableOrganizationDeletion: true,
+        allowUserToCreateOrganization: true,
+        invitationLimit: 25,
+        disableOrganizationDeletion: false,
       }),
       genericOAuth({
         config: [

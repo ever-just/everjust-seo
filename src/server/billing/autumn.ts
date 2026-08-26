@@ -1,5 +1,27 @@
+import { env } from "cloudflare:workers";
 import type { Autumn } from "autumn-js";
-import { getRequiredEnvValue } from "@/server/lib/runtime-env";
+import { getEnvValueSync, getRequiredEnvValue } from "@/server/lib/runtime-env";
+
+/**
+ * Whether Autumn/Stripe usage billing is active for this deployment.
+ *
+ * Billing is a no-op unless `AUTUMN_SECRET_KEY` is configured — a self-host
+ * multi-tenant instance runs with no billing account at all, and every credit
+ * gate must then grant full access instead of throwing when the SDK tries to
+ * read the (missing) secret. `BILLING_DISABLED=true` force-disables it even
+ * when a key happens to be present (e.g. staging against a shared secret).
+ *
+ * When this returns true, behavior is exactly as upstream: all gates call
+ * Autumn and meter spend. Callers in src/server/billing/subscription.ts
+ * short-circuit to "full access / unlimited" shapes when it returns false, so
+ * `getRequiredEnvValue("AUTUMN_SECRET_KEY")` is never reached while disabled.
+ */
+export function isBillingEnabled(): boolean {
+  if (getEnvValueSync(env, "BILLING_DISABLED") === "true") {
+    return false;
+  }
+  return Boolean(getEnvValueSync(env, "AUTUMN_SECRET_KEY"));
+}
 
 let autumnPromise: Promise<Autumn> | undefined;
 

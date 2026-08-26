@@ -52,6 +52,8 @@ vi.mock("@/server/lib/posthog", () => ({
 }));
 vi.mock("@/server/billing/autumn", () => ({
   autumn: { check: mocks.autumnCheck },
+  // Credit-ceiling tests exercise the metered path, so keep billing enabled.
+  isBillingEnabled: () => true,
 }));
 vi.mock("@/server/lib/runtime-env", () => ({
   isHostedServerAuthMode: mocks.isHostedServerAuthMode,

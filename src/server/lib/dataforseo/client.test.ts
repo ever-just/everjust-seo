@@ -32,6 +32,8 @@ vi.mock("@/server/billing/autumn", () => ({
     track: trackMock,
   },
   AUTUMN_TRACK_RETRY_OPTIONS: {},
+  // These tests exercise the metered hosted-billing path, so keep billing on.
+  isBillingEnabled: () => true,
 }));
 
 // Keep the real subscription module (its assertUsageCreditsAvailable calls the
