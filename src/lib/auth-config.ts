@@ -21,6 +21,11 @@ export function createBaseAuthConfig() {
       // google social-login tokens; the key derives from BETTER_AUTH_SECRET.
       encryptOAuthTokens: true,
       accountLinking: {
+        // Google verifies email ownership, so trust it to auto-link on sign-in:
+        // "Continue with Google" logs the user into an existing same-email
+        // account (or creates one) instead of failing with account_not_linked.
+        enabled: true,
+        trustedProviders: ["google"],
         // Allow connecting a Google account whose email differs from the
         // logged-in user's (agency/freelancer managing a client's property).
         allowDifferentEmails: true,

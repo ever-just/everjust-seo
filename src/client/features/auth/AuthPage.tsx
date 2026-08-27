@@ -100,11 +100,6 @@ export function AuthPageCard({
   return (
     <div className="w-full max-w-xs space-y-6">
       <div className="text-center space-y-3">
-        <img
-          src="/transparent-logo.png"
-          alt="EverJust SEO"
-          className="mx-auto size-10 rounded-lg"
-        />
         <div>
           <h1 className="text-xl font-semibold">{title}</h1>
           {helperText ? (

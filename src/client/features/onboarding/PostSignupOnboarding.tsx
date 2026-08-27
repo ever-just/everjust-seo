@@ -59,11 +59,6 @@ export function PostSignupOnboarding({
       {accountMenu}
 
       <div className="text-center space-y-3">
-        <img
-          src="/transparent-logo.png"
-          alt="EverJust SEO"
-          className="mx-auto size-10 rounded-lg"
-        />
         <p className="text-xs font-medium uppercase tracking-wide text-base-content/50">
           Step {step + 1} of {ONBOARDING_LAST_STEP + 1}
         </p>

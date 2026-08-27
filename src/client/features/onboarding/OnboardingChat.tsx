@@ -84,11 +84,6 @@ function SiteForm({ projectId }: { projectId: string }) {
         }}
       >
         <div className="space-y-3 text-center">
-          <img
-            src="/transparent-logo.png"
-            alt="EverJust SEO"
-            className="mx-auto size-10 rounded-lg"
-          />
           <h1 className="text-xl font-semibold">Tell us about your website.</h1>
           <p className="text-sm text-base-content/60">
             If you have multiple websites, you can set that up later.
