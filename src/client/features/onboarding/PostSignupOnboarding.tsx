@@ -61,7 +61,7 @@ export function PostSignupOnboarding({
       <div className="text-center space-y-3">
         <img
           src="/transparent-logo.png"
-          alt="OpenSEO"
+          alt="EverJust SEO"
           className="mx-auto size-10 rounded-lg"
         />
         <p className="text-xs font-medium uppercase tracking-wide text-base-content/50">
@@ -70,8 +70,8 @@ export function PostSignupOnboarding({
         <h1 className="text-xl font-semibold">
           {title ??
             (firstName
-              ? `Welcome to OpenSEO, ${firstName}!`
-              : "Welcome to OpenSEO!")}
+              ? `Welcome to EverJust SEO, ${firstName}!`
+              : "Welcome to EverJust SEO!")}
         </h1>
         <p className="text-sm text-base-content/60">
           {helperText ?? "A few quick answers to set things up."}
@@ -116,7 +116,7 @@ export function PostSignupOnboarding({
           />
         ) : step === 2 ? (
           <OnboardingChoiceGroup
-            title="How did you find OpenSEO?"
+            title="How did you find EverJust SEO?"
             options={[...SOURCE_OPTIONS]}
             selectedValues={answers.source ? [answers.source] : []}
             onToggle={(source) => updateAnswers({ source })}

@@ -23,7 +23,7 @@ export const whoamiTool = {
   config: {
     title: "Who am I",
     description:
-      "Confirms the connected OpenSEO account, server mode, token scopes, and current credit balance when the user asks to check their account or connection. Uses no credits — does not call DataForSEO.",
+      "Confirms the connected EverJust SEO account, server mode, token scopes, and current credit balance when the user asks to check their account or connection. Uses no credits — does not call DataForSEO.",
     inputSchema: {} as Record<string, never>,
     outputSchema: {
       userEmail: z.string(),

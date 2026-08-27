@@ -124,9 +124,9 @@ export function Sidebar({ projectId, onNavigate, onClose }: SidebarProps) {
         <Link
           to="/"
           onClick={onNavigate}
-          className="text-base font-semibold text-base-content"
+          className="font-serif text-xl tracking-tight text-base-content"
         >
-          OpenSEO
+          EverJust
         </Link>
         {onClose ? (
           <button

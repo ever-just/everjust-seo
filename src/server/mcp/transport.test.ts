@@ -34,8 +34,8 @@ vi.mock("@/server/mcp/server", () => ({
   createOpenSeoMcpServer: (props?: unknown) => {
     selfHostedAuthMocks.createOpenSeoMcpServer(props);
     return new McpServer({
-      name: "OpenSEO MCP",
-      title: "OpenSEO",
+      name: "EverJust SEO MCP",
+      title: "EverJust SEO",
       version: "0.0.11",
       description: "SEO research tools for AI agents",
       websiteUrl: "https://openseo.so",

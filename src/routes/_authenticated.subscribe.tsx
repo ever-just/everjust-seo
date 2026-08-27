@@ -15,7 +15,7 @@ import {
   AUTUMN_PAID_PLAN_ID,
 } from "@/shared/billing";
 
-const SUPPORT_EMAIL = "ben@openseo.so";
+const SUPPORT_EMAIL = "company@everjust.co";
 
 const PLAN_FEATURES = [
   "Keyword research, backlinks, rank tracking, and site audits",
@@ -130,7 +130,7 @@ function SubscribePage() {
       <div className="w-full max-w-xs space-y-4 text-center">
         <img
           src="/transparent-logo.png"
-          alt="OpenSEO"
+          alt="EverJust SEO"
           className="mx-auto size-10 rounded-lg"
         />
         <h1 className="text-xl font-semibold">
@@ -157,7 +157,7 @@ function SubscribePage() {
         <div className="text-center space-y-3">
           <img
             src="/transparent-logo.png"
-            alt="OpenSEO"
+            alt="EverJust SEO"
             className="mx-auto size-10 rounded-lg"
           />
           <h1 className="text-xl font-semibold">Billing unavailable</h1>
@@ -216,15 +216,15 @@ function SubscribePage() {
       <div className="text-center space-y-3">
         <img
           src="/transparent-logo.png"
-          alt="OpenSEO"
+          alt="EverJust SEO"
           className="mx-auto size-10 rounded-lg"
         />
         <h1 className="text-xl font-semibold">
           {isUpgradeFlow
             ? "Upgrade your plan"
             : firstName
-              ? `Welcome to OpenSEO, ${firstName}!`
-              : "Welcome to OpenSEO!"}
+              ? `Welcome to EverJust SEO, ${firstName}!`
+              : "Welcome to EverJust SEO!"}
         </h1>
         <p className="text-sm text-base-content/60">
           SEO on your terms. All your SEO tools in one place at a fair price.

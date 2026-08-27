@@ -2,6 +2,9 @@
 
 @theme {
   --container-8xl: 88rem;
+  /* EverJust brand fonts */
+  --font-sans: "Geist", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Instrument Serif", Georgia, "Times New Roman", serif;
 }
 
 :root {
@@ -29,11 +32,11 @@
   --color-base-200: oklch(97% 0 0);
   --color-base-300: oklch(92% 0 0);
   --color-base-content: oklch(20% 0 0);
-  --color-primary: oklch(50% 0.12 262);
+  --color-primary: oklch(47% 0.25 272);
   --color-primary-content: oklch(100% 0 0);
   --color-secondary: oklch(55% 0.15 145);
   --color-secondary-content: oklch(100% 0 0);
-  --color-accent: oklch(50% 0.12 262);
+  --color-accent: oklch(47% 0.25 272);
   --color-accent-content: oklch(100% 0 0);
   --color-neutral: oklch(25% 0 0);
   --color-neutral-content: oklch(100% 0 0);
@@ -64,11 +67,11 @@
   --color-base-200: oklch(12% 0 0);
   --color-base-300: oklch(27% 0 0);
   --color-base-content: oklch(92% 0 0);
-  --color-primary: oklch(66% 0.12 262);
+  --color-primary: oklch(62% 0.20 272);
   --color-primary-content: oklch(100% 0 0);
   --color-secondary: oklch(60% 0.15 145);
   --color-secondary-content: oklch(100% 0 0);
-  --color-accent: oklch(66% 0.12 262);
+  --color-accent: oklch(62% 0.20 272);
   --color-accent-content: oklch(100% 0 0);
   --color-neutral: oklch(85% 0 0);
   --color-neutral-content: oklch(20% 0 0);

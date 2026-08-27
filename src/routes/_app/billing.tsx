@@ -184,7 +184,7 @@ function BillingPage() {
               </div>
               <ul className="space-y-1.5">
                 {[
-                  "Access to all OpenSEO features",
+                  "Access to all EverJust SEO features",
                   "Includes $10.00 of Usage Credits each month",
                 ].map((item) => (
                   <li

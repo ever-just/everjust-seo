@@ -39,7 +39,7 @@ const HERO_COPY: Record<
   },
   mcp: {
     title: "Connect your AI agent",
-    body: "OpenSEO is built to be used from agents like Claude. Connect once, then ask it to use OpenSEO to help build your SEO strategy.",
+    body: "EverJust SEO is built to be used from agents like Claude. Connect once, then ask it to use EverJust SEO to help build your SEO strategy.",
     cta: "Show me how",
   },
   gsc: {

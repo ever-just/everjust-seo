@@ -181,7 +181,7 @@ function MobileTopBar({
         <Menu className="h-5 w-5" />
       </button>
       <Link to="/" className="ml-1 font-semibold text-base-content">
-        OpenSEO
+        EverJust SEO
       </Link>
     </div>
   );

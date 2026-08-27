@@ -16,9 +16,9 @@ function OpenrouterApiKeyHelpPage() {
               Set up your OpenRouter API key
             </h1>
             <p className="text-sm text-base-content/70">
-              OpenSEO needs the <code>OPENROUTER_API_KEY</code> secret before AI
+              EverJust SEO needs the <code>OPENROUTER_API_KEY</code> secret before AI
               features like SAM, the in-app SEO agent, can run. It is optional —
-              everything else in OpenSEO works without it.
+              everything else in EverJust SEO works without it.
             </p>
           </div>
         </div>
@@ -64,7 +64,7 @@ function OpenrouterApiKeyHelpPage() {
                   </li>
                 </ul>
               </li>
-              <li>Restart OpenSEO.</li>
+              <li>Restart EverJust SEO.</li>
             </ol>
           </div>
         </div>
@@ -78,7 +78,7 @@ function OpenrouterApiKeyHelpPage() {
               <li>
                 In Cloudflare, go to <code>Compute</code> -&gt;{" "}
                 <code>Workers &amp; Pages</code>
-                and open your OpenSEO Worker.
+                and open your EverJust SEO Worker.
               </li>
               <li>
                 Open <code>Settings</code>.

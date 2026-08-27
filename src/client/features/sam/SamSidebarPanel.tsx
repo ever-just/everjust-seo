@@ -37,7 +37,7 @@ function BetaNotice() {
         </button>
       </div>
       <p className="mt-1.5 text-xs text-base-content/70">
-        For more powerful AI workflows, use the OpenSEO MCP with your own agent
+        For more powerful AI workflows, use the EverJust SEO MCP with your own agent
         like Claude Code or Hermes.
       </p>
       <Link to="/ai" className="link link-primary mt-1.5 inline-block text-xs">

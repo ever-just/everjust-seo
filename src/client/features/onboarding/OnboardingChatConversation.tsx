@@ -62,8 +62,8 @@ const resolveToolLabel: ResolveToolLabel = (partType) =>
   TOOL_LABELS[partType] ?? null;
 
 const SUGGESTED_QUESTIONS = [
-  "How will OpenSEO help me get more traffic?",
-  "Compare OpenSEO and Claude",
+  "How will EverJust SEO help me get more traffic?",
+  "Compare EverJust SEO and Claude",
   "What do I get after I upgrade?",
   "How does the Google Search Console integration work?",
   "Right fit for consultants and agencies?",

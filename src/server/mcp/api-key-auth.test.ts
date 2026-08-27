@@ -187,7 +187,7 @@ describe("handleMcpApiKeyRequest", () => {
     expect(mocks.handleAuthenticatedOpenSeoMcpRequest).not.toHaveBeenCalled();
   });
 
-  it("leaves non-OpenSEO bearer tokens for OAuth", async () => {
+  it("leaves non-EverJust SEO bearer tokens for OAuth", async () => {
     await expect(
       handleMcpApiKeyRequest(
         request({ Authorization: "Bearer oauth-access-token" }),
@@ -198,7 +198,7 @@ describe("handleMcpApiKeyRequest", () => {
     expect(mocks.verifyApiKey).not.toHaveBeenCalled();
   });
 
-  it("leaves non-OpenSEO x-api-key values for OAuth", async () => {
+  it("leaves non-EverJust SEO x-api-key values for OAuth", async () => {
     await expect(
       handleMcpApiKeyRequest(
         request({
