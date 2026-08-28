@@ -19,7 +19,7 @@ export function ApiKeySettings() {
 
   const mcpUrl =
     typeof window === "undefined"
-      ? "https://app.openseo.so/mcp"
+      ? "https://seo.everjust.app/mcp"
       : `${window.location.origin}/mcp`;
 
   const apiKeysQuery = useQuery({

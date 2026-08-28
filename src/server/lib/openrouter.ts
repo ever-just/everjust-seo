@@ -1,3 +1,4 @@
+import { createOpenAI } from "@ai-sdk/openai";
 import {
   createOpenRouter,
   type LanguageModelV3,
@@ -10,44 +11,46 @@ import {
 // OpenRouter model slug used for the in-app chat agents (onboarding + SAM).
 // Override with OPENROUTER_MODEL to swap models without a code change.
 const DEFAULT_CHAT_AGENT_MODEL = "minimax/minimax-m3";
+// Default model when routing to an OpenAI-compatible endpoint (Meta Muse).
+const DEFAULT_OPENAI_COMPAT_MODEL = "muse-spark-1.1";
 
 /**
- * Returns the AI SDK LanguageModel for the chat agents. `usage: { include: true }`
- * turns on OpenRouter usage accounting so each response carries its real USD
- * cost (providerMetadata.openrouter.usage.cost) — which we meter against the
- * shared usage-credit pool. `provider.order` prefers Together, then Atlas
- * Cloud (fp8); `zdr: true` restricts routing to Zero-Data-Retention endpoints
- * (prompts are never retained), which is the actual constraint — it excludes
- * MiniMax first-party without a hand-maintained allowlist. The account also
- * enforces this ("Non-frontier requires ZDR" data policy); the request-level
- * flag is belt-and-braces so the constraint survives a dashboard change.
- * Fallbacks stay on within the ZDR set because pinning providers caused a
- * prod outage (Jul 2026: Together upstream-rate-limited m3 and every chat
- * turn 429'd); as of Jul 2026 the ZDR set for m3 is Together/AtlasCloud/
- * Novita/Parasail at the same price plus Morph at 2x output as a last resort.
+ * Returns the AI SDK LanguageModel for the chat agents.
  *
- * `reasoning` turns on OpenRouter's reasoning-token channel so the model's
- * chain-of-thought comes back as a separate reasoning stream instead of
- * leaking into the visible answer text (MiniMax M3 otherwise dumps its
- * `<think>` trace inline). `effort: "medium"` is OpenRouter's default —
- * stated explicitly only because the SDK type requires one once the channel
- * is configured.
+ * Two providers, selected by LLM_BASE_URL:
+ *  - unset  → OpenRouter (default). `usage: { include: true }` turns on
+ *    OpenRouter usage accounting so each response carries its real USD cost
+ *    (providerMetadata.openrouter.usage.cost), metered against the usage-credit
+ *    pool; `provider.order` prefers Together then Atlas Cloud (fp8); `zdr: true`
+ *    restricts routing to Zero-Data-Retention endpoints; `reasoning` splits the
+ *    model's chain-of-thought into a separate stream instead of leaking inline.
+ *  - set    → any OpenAI-compatible endpoint (e.g. Meta Muse at
+ *    https://api.meta.ai/v1, model muse-spark-1.1). The OpenRouter-only options
+ *    above don't apply; usage-cost metering is already inert unless Autumn
+ *    billing is configured (see isBillingEnabled), so nothing is lost here.
  */
 export async function getChatAgentModel(): Promise<LanguageModelV3> {
   const apiKey = await getRequiredEnvValue("OPENROUTER_API_KEY");
   const modelId = await getOptionalEnvValue("OPENROUTER_MODEL");
-  return buildChatAgentModel(apiKey, modelId);
+  const baseUrl = await getOptionalEnvValue("LLM_BASE_URL");
+  return buildChatAgentModel(apiKey, modelId, baseUrl);
 }
 
 /**
  * Synchronous variant for callers that already hold the env values. Think's
  * `getModel()` hook is sync and runs on every turn, so the SAM agent reads the
- * key/model from its DO env and builds the model here.
+ * key/model/base-url from its DO env and builds the model here.
  */
 export function buildChatAgentModel(
   apiKey: string,
   modelId?: string,
+  baseUrl?: string,
 ): LanguageModelV3 {
+  if (baseUrl) {
+    return createOpenAI({ apiKey, baseURL: baseUrl })(
+      modelId ?? DEFAULT_OPENAI_COMPAT_MODEL,
+    ) as LanguageModelV3;
+  }
   return createOpenRouter({ apiKey })(modelId ?? DEFAULT_CHAT_AGENT_MODEL, {
     usage: { include: true },
     reasoning: { effort: "medium" },

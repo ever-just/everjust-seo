@@ -54,6 +54,11 @@ declare namespace Cloudflare {
     OPENROUTER_API_KEY?: string;
     // Optional OpenRouter model slug override (defaults in openrouter.ts).
     OPENROUTER_MODEL?: string;
+    // Optional: route the chat agents to an OpenAI-compatible endpoint instead
+    // of OpenRouter (e.g. Meta Muse at https://api.meta.ai/v1). When set,
+    // OPENROUTER_API_KEY holds that provider's key and OPENROUTER_MODEL its
+    // model slug (e.g. muse-spark-1.1).
+    LLM_BASE_URL?: string;
   }
 }
 

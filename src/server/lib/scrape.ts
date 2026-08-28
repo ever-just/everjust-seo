@@ -11,7 +11,7 @@ export const MAX_PAGES = 5;
 const PER_PAGE_CHAR_LIMIT = 4000;
 const FETCH_TIMEOUT_MS = 10_000;
 const MAX_RESPONSE_BYTES = 2_000_000;
-const USER_AGENT = "EverJust SEO-Onboarding/1.0 (+https://openseo.so)";
+const USER_AGENT = "EverJust SEO-Onboarding/1.0 (+https://everjust.co)";
 
 type ScrapedPage = {
   url: string;

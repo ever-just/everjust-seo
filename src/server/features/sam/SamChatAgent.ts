@@ -133,6 +133,7 @@ export class SamChatAgent extends Think {
     return buildChatAgentModel(
       apiKey,
       getEnvValueSync(this.env, "OPENROUTER_MODEL"),
+      getEnvValueSync(this.env, "LLM_BASE_URL"),
     );
   }
 
@@ -284,7 +285,7 @@ export class SamChatAgent extends Think {
 
       const baseUrl =
         (await this.ctx.storage.get<string>(PUBLIC_ORIGIN_KEY)) ??
-        "https://app.openseo.so";
+        "https://seo.everjust.app";
       const authContext: ToolAuthContext = {
         userId: ctx.row.userId,
         userEmail: ctx.userEmail,

@@ -98,7 +98,7 @@ EverJust SEO exposes an MCP server so compatible AI clients can call EverJust SE
 Hosted MCP endpoint:
 
 ```txt
-https://app.openseo.so/mcp
+https://seo.everjust.app/mcp
 ```
 
 The first MCP connection sends the user through EverJust SEO login and authorization. After authorization, the MCP client can call EverJust SEO tools with the project context and account scopes the user approved.
